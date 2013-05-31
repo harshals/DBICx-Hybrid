@@ -19,6 +19,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib "t/lib";
 
 BEGIN {
 	use_ok( 'Schema');
