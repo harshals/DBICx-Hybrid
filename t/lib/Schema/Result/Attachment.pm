@@ -4,48 +4,35 @@ use strict;
 use warnings;
 
 use Moose;
+use Carp qw/croak confess/;
 use namespace::clean -except => 'meta';
 
 extends qw/DBICx::Hybrid::Result/;
+with 'DBICx::Hybrid::ResultRole::Attachment';
 
 __PACKAGE__->table("attachment");
-__PACKAGE__->add_columns(
 
-	"name", { data_type => "VARCHAR(200)", is_nullable => 0 },
-	"path", { data_type => "VARCHAR(200)", is_nullable => 0 },
-	"owner_id", { data_type => "INTEGER", is_nullable => 0 },
-	"keywords", { data_type => "VARCHAR(200)", is_nullable => 1 },
-);
+__PACKAGE__->set_up;
 
-__PACKAGE__->add_base_columns;
+after 'set_up'	=>	sub {
 
-__PACKAGE__->set_primary_key("id");
+	my $self = shift;
+	my $source = $self->result_source_instance;
 
-__PACKAGE__->belongs_to(
-  "owner",
-  "Schema::Result::Contact",
-  { "foreign.id" => "self.owner_id" },
-);
-
-
-
-# Created by DBIx::Class::Schema::Loader v0.04006 @ 2009-08-13 21:11:53
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:obZUGgvkve3e6mzPk8GEEg
-
-sub extra_columns {
-    
-    my $self = shift;
-
-    return qw/db_user db_pass host port driver description/;
 };
 
-sub my_relations {
+sub extra_columns {
 
-    my $self = shift;
-	return qw/users/;
-}
-;
+	my $class = shift;
 
+	my @columns = $class->next::method(@_);
+
+	push @columns, (qw/db_user db_pass host port driver/);
+
+	return @columns;
+
+};
 
 __PACKAGE__->meta->make_immutable(inline_constructor => 0);
+# You can replace this text with custom content, and it will be preserved on regeneration
 1;

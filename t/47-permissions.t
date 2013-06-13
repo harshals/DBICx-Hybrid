@@ -14,9 +14,10 @@
 #      CREATED:  10/10/2011 12:35:54 IST
 #     REVISION:  ---
 #===============================================================================
-
 use strict;
 use warnings;
+
+use lib "t/lib";
 
 use Test::More ;
 use Data::Dumper;
@@ -34,7 +35,6 @@ my $username = $args{"u"};
 my $host = $args{"h"};
 
 ##auto correct db types
-
 $dbtype = "SQLite" if $dbtype =~ /sqlite/i;
 $dbtype = "mysql" if $dbtype =~ /mysql/i;
 $dbtype = "PostgreSQL" if $dbtype =~ /pg|postgre/i;
@@ -55,25 +55,21 @@ my $book_rs = $schema->resultset("Book");
 my $old_book = $book_rs->fetch(2);
 
 is($old_book->id, 2, "Found 2nd book");
-
 ok($old_book->has_access("read"), "Has read access");
 ok($old_book->has_access("write"), "Has read access");
 
 my $parents = [2,4];
-
 
 $schema->parents(1);
 $schema->acl(1);
 $schema->read_parents($parents);
 
 $old_book->grant_access("read");
-
 $old_book->update;
 
 my $new_book = $book_rs->fetch_new();
 
 $new_book->save({
-	
 	isbn => rand() * 1000000,
 	classification => $old_book->classification,
 	price => $old_book->price,
@@ -87,7 +83,6 @@ $new_book->save({
 });
 
 $schema->user(2);
-
 
 ok($old_book->has_access, "Parents have read access");
 ok(!$old_book->has_access("write"), "Parents do not have write access");
@@ -105,4 +100,3 @@ $new_book->remove;
 $new_book->purge;
 
 done_testing;
-

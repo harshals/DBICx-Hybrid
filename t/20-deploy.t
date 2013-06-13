@@ -1,11 +1,13 @@
 use warnings;
 use strict;
+
+use lib "t/lib";
+
 use Data::Printer;
 use Test::More ;
 
 BEGIN { use_ok 'Master' };
 BEGIN { use_ok 'Schema' };
-
 
 #diag("Remove old database if it exists");
 
@@ -24,7 +26,6 @@ $dbtype = "SQLite" if $dbtype =~ /sqlite/i;
 $dbtype = "mysql" if $dbtype =~ /mysql/i;
 $dbtype = "PostgreSQL" if $dbtype =~ /pg|postgre/i;
 
-
 like($dbtype,qr/SQLite|mysql|PostgreSQL/, "Found Correct DB Type");
 
 SKIP: {
@@ -34,21 +35,21 @@ SKIP: {
 
 SKIP: {
 	skip "Only SQLite specific test", 1 unless $dbtype eq 'SQLite';
-
 	`rm -f $dbname` if -f $dbname;
 	`rm -f $masterdb` if -f $masterdb;
 	ok(! (-f $dbname), "No existing database");
 }
 
-#print Data::Printer::p(Schema);
-
 my $schema = Schema->init_schema($dbname, $dbtype, $username, $password , $host);
+
 my $master = Master->init_schema($masterdb, $dbtype, $username, $password , $host);
 
 isa_ok($schema, 'DBIx::Class::Schema', "Schema initialised properly");
+
 isa_ok($master, 'DBIx::Class::Schema', "Master Schema initialised properly");
 
 $schema->user(1);
+
 $master->user(1);
 
 SKIP: {
@@ -65,8 +66,8 @@ SKIP: {
 	`sqlite3 $masterdb < $filename`;
 	#`sqlite3 $dbname < Schema-1.x-$dbtype.sql`;
 	ok(-f $masterdb , "Deployed $masterdb database");
-
 }
+
 SKIP: {
 	skip "Only Mysql or PostgresSQL specific test", 1 if $dbtype eq 'SQLite';
 
@@ -80,26 +81,20 @@ SKIP: {
 is($schema->user, 1, "Schema user set to 1 ");
 
 my $author_rs = $schema->resultset("Author");
-
 isa_ok($author_rs, 'Schema::ResultSet::Author');
 
 my $book_rs = $schema->resultset("Book");
-
 isa_ok($book_rs, 'DBICx::Hybrid::ResultSet');
 
 my $category_rs = $schema->resultset("Category");
-
 isa_ok($category_rs, 'DBICx::Hybrid::ResultSet');
 
 my $affiliate_rs = $schema->resultset("Affiliate");
-
 isa_ok($affiliate_rs, 'DBICx::Hybrid::ResultSet');
 
 is($master->user, 1, "Master user set to 1 ");
 
 my $user_rs = $master->resultset("User");
-
 isa_ok($user_rs, 'Master::ResultSet::User');
-
 
 done_testing;

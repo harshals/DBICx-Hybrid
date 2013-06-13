@@ -11,4 +11,3 @@ BEGIN {
 }
 
 diag( "Testing DBICx::Hybrid  $DBICx::Hybrid::VERSION, Perl $], $^X" );
-

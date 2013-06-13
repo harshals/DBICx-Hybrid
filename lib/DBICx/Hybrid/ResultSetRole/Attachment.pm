@@ -1,7 +1,7 @@
 #
 #===============================================================================
 #
-#         FILE:  User.pm
+#         FILE:  Attachment.pm
 #
 #  DESCRIPTION:  
 #
@@ -11,29 +11,42 @@
 #       AUTHOR:  Harshal Shah (Hs), <harshal.shah@gmail.com>
 #      COMPANY:  MK Software
 #      VERSION:  1.0
-#      CREATED:  02/11/2011 18:27:43 IST
+#      CREATED:  04/27/2011 17:11:40 IST
 #     REVISION:  ---
 #===============================================================================
-package Master::ResultSet::User;
+package DBICx::Hybrid::ResultSetRole::Attachment;
 
 use strict;
 use warnings;
 
-use Moose;
+use Moose::Role;
 use Carp qw/croak confess/;
 use namespace::clean -except => 'meta';
 
-extends qw/DBICx::Hybrid::ResultSet/;
-with qw/DBICx::Hybrid::ResultSetRole::User/;
+sub _build_template_prefix {
 
-=head2 resultset->by_profile($profile_id)
+	return "attachment";
 
-Find a given user by profile_id (Contacts)
+};
 
-returns Result row
+sub attachments_for {
 
-=cut
+	my $self = shift;
+	my $class = shift;
+	my $id = shift;
+	my $uuid = shift;
 
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+	my $search = {};
+
+	croak "DBIC: Can't find attachments without requisite class " unless $class;
+
+	$search->{owner_class} = $class;
+	$search->{owner_id} = $id if $id;
+	$search->{owner_uuid} = $id if $uuid;
+
+	return $self->look_for($search );
+
+};
+
 # You can replace this text with custom content, and it will be preserved on regeneration
 1;

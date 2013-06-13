@@ -410,7 +410,7 @@ sub serialize_with_options {
 
 	my ($list, $rs);
 		
-	if ($options->{'page_length'} ne 'all' && $options->{'page_no'} =~ m/\d/) {
+	if ($options->{'page_length'} && $options->{'page_length'} ne 'all' && $options->{'page_no'} =~ m/\d/) {
 		
 		$rs = $self->search_rs(undef, { page => $options->{'page_no'} , rows => $options->{'page_length'} });
 	}else {

@@ -1,7 +1,8 @@
-package DBICx::Hybrid::Result::Attachment;
+package DBICx::Hybrid::ResultRole::Attachment;
 
 use strict;
 use warnings;
+
 use Moose::Role;
 use Carp qw/croak confess/;
 use namespace::clean -except => 'meta';
@@ -18,14 +19,16 @@ sub set_up {
 		"path", { data_type => "VARCHAR(200)", is_nullable => 0 },
 		"content_type", { data_type => "VARCHAR(100)", is_nullable => 1 },
 		"owner_id", { data_type => "INTEGER", is_nullable => 0 },
-		"owner_class", { data_type => "VARCHAR(200)", is_nullable => 0 },
-		"owner_uuid", { data_type => "VARCHAR(200)", is_nullable => 0 },
+		"owner_class", { data_type => "VARCHAR(200)", is_nullable => 1 },
+		"owner_uuid", { data_type => "VARCHAR(200)", is_nullable => 1 },
 		"keywords", { data_type => "VARCHAR(200)", is_nullable => 1 },
+
 	);
 
 	$self->add_base_columns;
 
 	$self->set_primary_key("id");
+
 };
 
 =pod
@@ -50,18 +53,27 @@ sub set_up {
 	);
 =cut
 
-
 # Created by DBIx::Class::Schema::Loader v0.04006 @ 2009-08-13 21:11:53
 # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:obZUGgvkve3e6mzPk8GEEg
 
 around 'extra_columns' => sub {
 
 	my $orig = shift;
-    my $class = shift;
+	my $class = shift;
+
 	my @columns = $class->$orig(@_);
 
-    push @columns, qw/description/;
-    
-    return @columns;
+	push @columns, qw/description/;
+	return @columns;
+
 };
+
+sub my_relations {
+
+	my $self = shift;
+	return qw//;
+
+};
+
+# You can replace this text with custom content, and it will be preserved on regeneration
 1;

@@ -14,34 +14,20 @@
 #      CREATED:  02/12/2011 12:01:54 IST
 #     REVISION:  ---
 #===============================================================================
+package DBICx::Hybrid::ResultSetRole::Task;
 
-
-package DBICx::Hybrid::ResultSet::Task;
 use strict;
 use warnings;
+
 use Moose::Role;
-use namespace::clean -except => 'meta';
 use Carp qw/croak confess/;
-
-# ABSTRACT: ResultSet Class for Task
-=head1 NAME
-
-DBICx::Hybrid::ResultSet::Task
-
-Some common routines for Task resultclass
-
-=head1 METHODS
-
-=head2 resultset->updated_on($days) 
-
-finds a record updated in last # of $days
-
-=cut
+use namespace::clean -except => 'meta';
 
 sub _build_template_prefix {
-	
+
 	return "task";
-}
+
+};
 
 sub tasks {
 
@@ -50,9 +36,10 @@ sub tasks {
 	my $alias = $self->current_source_alias;
 
 	return $self;
+
 	#$self->search_rs( { "$alias.category" =>  'task'  });
 
-}
+};
 
 sub messages {
 
@@ -62,19 +49,23 @@ sub messages {
 
 	$self->search_rs( { "$alias.category" =>  'message'  });
 
-}
+};
 
-sub due_in{
-	
+sub due_in {
+
 	my ($self, $days) = @_;
 
 	$days++;
+
 	my $now = DateTime->now();
+
 	my $later = $now->clone->add( days => $days );
 
 	my $alias = $self->current_source_alias;
+
 	$self->tasks->incomplete_tasks->search_rs( { "$alias.due_date" => { -between => [ $now->ymd, $later->ymd ] } });
-}
+
+};
 
 sub incomplete_tasks {
 
@@ -84,7 +75,7 @@ sub incomplete_tasks {
 
 	$self->search_rs( { "$alias.task_status" =>  'Incomplete'  });
 
-}
+};
 
 sub unread_messages {
 
@@ -94,17 +85,19 @@ sub unread_messages {
 
 	$self->messages->search_rs( { "$alias.task_status" =>  'Unread'  });
 
-}
+};
+
 sub overdue_tasks {
 
 	my ($self, $days) = @_;
 
 	my $alias = $self->current_source_alias;
+
 	my $now = DateTime->now();
 
 	$self->tasks->incomplete_tasks->search_rs( { "$alias.due_date" =>  {  '>', $now->ymd  }   }  );
 
-}
+};
 
 sub completed_tasks {
 
@@ -114,7 +107,7 @@ sub completed_tasks {
 
 	$self->tasks->search_rs( { "$alias.task_status" => { '!=', 'Incomplete' } });
 
-}
+};
 
 sub read_messages {
 
@@ -124,8 +117,7 @@ sub read_messages {
 
 	$self->messages->search_rs( { "$alias.task_status" => { '!=', 'Read' } });
 
-}
+};
 
-
-
+# You can replace this text with custom content, and it will be preserved on regeneration
 1;
